@@ -1,0 +1,1247 @@
+<!DOCTYPE html><html lang="fr"><head><link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Chía Personnalisé — Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f5f7fa;
+    color: #2c3e50;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    padding: 32px 28px;
+    margin-bottom: 16px;
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .logo img {
+    max-height: 110px;
+    width: auto;
+    display: inline-block;
+  }
+  .tagline {
+    text-align: center;
+    font-size: 12px;
+    color: #7a8a99;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .progress-bar {
+    background: #e8ecf0;
+    height: 6px;
+    border-radius: 3px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, #6ba832, #4a7c2a);
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  .step { display: none; animation: fadeIn 0.3s ease; }
+  .step.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  h2 {
+    font-size: 22px;
+    margin-bottom: 18px;
+    color: #2c3e50;
+    text-align: center;
+    line-height: 1.3;
+  }
+  h3 { font-size: 17px; margin-bottom: 10px; color: #2c3e50; }
+  .question-num {
+    font-size: 12px;
+    color: #6ba832;
+    text-align: center;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    background: #f8f9fb;
+    border: 2px solid #e8ecf0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s;
+    text-align: left;
+    color: #2c3e50;
+    font-family: inherit;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option:hover {
+    border-color: #6ba832;
+    background: #f1f7e8;
+  }
+  .option .emoji { font-size: 22px; flex-shrink: 0; }
+  .input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .input-group input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #e0e6ec;
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: inherit;
+    color: #2c3e50;
+    text-align: center;
+    font-weight: 600;
+  }
+  .input-group input:focus { outline: none; border-color: #6ba832; }
+  .input-suffix {
+    background: #f8f9fb;
+    padding: 14px 18px;
+    border: 2px solid #e0e6ec;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #5a6c7d;
+    display: flex;
+    align-items: center;
+  }
+  .btn-primary {
+    background: #4a7c2a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary:hover { background: #3d6722; }
+  .btn-big {
+    padding: 18px 24px;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(74,124,42,0.3);
+  }
+
+  /* Loading screen */
+  .loading-screen { text-align: center; padding: 20px 0; }
+  .loading-icon {
+    font-size: 42px;
+    margin-bottom: 16px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.85; }
+  }
+  .loading-bar {
+    background: #e8ecf0;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 22px 0 14px;
+  }
+  .loading-fill {
+    background: linear-gradient(90deg, #6ba832, #4a7c2a);
+    height: 100%;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+  .loading-pct {
+    font-size: 14px;
+    color: #5a6c7d;
+    font-weight: 600;
+  }
+  .loading-tasks {
+    margin-top: 22px;
+    text-align: left;
+    background: #f8f9fb;
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+  .loading-task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+    color: #7a8a99;
+    transition: color 0.3s;
+  }
+  .loading-task.done { color: #2c3e50; }
+  .loading-task.done .check { color: #4a7c2a; }
+  .check { width: 18px; display: inline-block; text-align: center; }
+
+  /* Sales page */
+  .result-header {
+    background: linear-gradient(135deg, #6ba832, #4a7c2a);
+    color: #fff;
+    border-radius: 12px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .result-header .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  .result-header h1 {
+    font-size: 26px;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  .result-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .result-stat {
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 12px 8px;
+  }
+  .result-stat .val {
+    font-size: 22px;
+    font-weight: 700;
+    display: block;
+  }
+  .result-stat .lbl {
+    font-size: 11px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .imc-bar {
+    background: rgba(255,255,255,0.2);
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .imc-marker {
+    position: absolute;
+    top: -3px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transform: translateX(-50%);
+  }
+  .imc-classification {
+    background: rgba(0,0,0,0.15);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  /* Chart */
+  .chart-wrap {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .chart-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .chart-sub {
+    font-size: 13px;
+    color: #7a8a99;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .chart-svg { width: 100%; height: 180px; }
+  .chart-legend {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #5a6c7d;
+  }
+
+  /* Benefits cards */
+  .benefit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .benefit {
+    background: #f8f9fb;
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    border: 1px solid #e8ecf0;
+  }
+  .benefit .ico { font-size: 28px; margin-bottom: 6px; }
+  .benefit .lbl { font-size: 13px; font-weight: 600; color: #2c3e50; }
+
+  /* What you get */
+  .includes-list { margin-top: 8px; }
+  .includes-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f3f6;
+  }
+  .includes-item:last-child { border-bottom: none; }
+  .includes-item .ck {
+    background: #6ba832;
+    color: #fff;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .includes-item .body strong { display: block; font-size: 15px; color: #2c3e50; margin-bottom: 2px; }
+  .includes-item .body span { font-size: 13px; color: #7a8a99; }
+  .includes-item .price-tag { margin-left: auto; font-size: 13px; color: #4a7c2a; font-weight: 700; }
+
+  /* Comparison table */
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    font-size: 13px;
+  }
+  .compare th, .compare td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0f3f6;
+  }
+  .compare th { background: #f8f9fb; font-size: 12px; color: #5a6c7d; text-transform: uppercase; }
+  .compare th.us { background: #f1f7e8; color: #4a7c2a; }
+  .compare td.us { background: #fafdf6; font-weight: 600; }
+  .compare td.first { text-align: left; font-weight: 600; color: #2c3e50; }
+  .yes { color: #4a7c2a; font-weight: 700; }
+  .no { color: #c44; }
+
+  /* Testimonials */
+  .testimonial {
+    background: #f8f9fb;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 3px solid #6ba832;
+  }
+  .testimonial .head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .testimonial .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6ba832, #4a7c2a);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .testimonial .name { font-weight: 600; font-size: 14px; }
+  .testimonial .meta { font-size: 12px; color: #7a8a99; }
+  .testimonial .stars { color: #f5b800; font-size: 13px; margin-left: auto; }
+  .testimonial p { font-size: 14px; color: #4a5764; }
+
+  /* Avant/Après */
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .before-after img {
+    width: 100%;
+    border-radius: 8px;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  /* Guarantee */
+  .guarantee {
+    background: linear-gradient(135deg, #fffef5, #fff9e0);
+    border: 2px solid #f5d97a;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .guarantee-badge {
+    font-size: 42px;
+    margin-bottom: 8px;
+  }
+  .guarantee h3 { font-size: 18px; color: #8a6d1a; margin-bottom: 6px; }
+  .guarantee p { font-size: 14px; color: #5a4a1a; }
+
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid #e8ecf0;
+    padding: 14px 0;
+  }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    color: #2c3e50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .faq-q .arrow {
+    color: #6ba832;
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .faq-item.open .arrow { transform: rotate(180deg); }
+  .faq-a {
+    display: none;
+    padding-top: 10px;
+    font-size: 14px;
+    color: #5a6c7d;
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* Pricing block */
+  .pricing {
+    background: linear-gradient(135deg, #fff, #f8fbf2);
+    border: 2px solid #6ba832;
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(74,124,42,0.15);
+  }
+  .pricing .label-promo {
+    background: #ff6b6b;
+    color: #fff;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+  .pricing h3 { font-size: 19px; margin-bottom: 16px; }
+  .price-old {
+    color: #a0a8b0;
+    text-decoration: line-through;
+    font-size: 18px;
+  }
+  .price-new {
+    color: #4a7c2a;
+    font-size: 44px;
+    font-weight: 800;
+    margin: 6px 0;
+    line-height: 1;
+  }
+  .price-new .cents { font-size: 24px; vertical-align: super; }
+  .price-installment { font-size: 14px; color: #5a6c7d; margin-bottom: 18px; }
+  .price-save {
+    background: #f1f7e8;
+    color: #4a7c2a;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 18px;
+  }
+  .stamps {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .stamp {
+    text-align: center;
+    flex: 1;
+    min-width: 80px;
+  }
+  .stamp .ico { font-size: 22px; }
+  .stamp .lbl { font-size: 11px; color: #7a8a99; margin-top: 4px; font-weight: 600; }
+
+  /* Urgency */
+  .urgency {
+    background: #fff5f5;
+    border: 1px solid #ffd0d0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #c44;
+  }
+  .urgency strong { font-size: 15px; }
+
+  /* Section header */
+  .sec-head {
+    text-align: center;
+    margin: 24px 0 14px;
+  }
+  .sec-head h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .sec-head p { font-size: 13px; color: #7a8a99; }
+
+  /* Welcome screen */
+  .welcome { text-align: center; padding: 8px 0 4px; }
+  .welcome .hero-ico {
+    font-size: 56px;
+    margin-bottom: 12px;
+  }
+  .welcome h1 {
+    font-size: 26px;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    color: #2c3e50;
+  }
+  .welcome h1 .hl { color: #4a7c2a; }
+  .welcome .lede {
+    font-size: 15px;
+    color: #5a6c7d;
+    margin-bottom: 22px;
+  }
+  .welcome-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 20px 0;
+  }
+  .welcome-stat {
+    background: #f8f9fb;
+    border-radius: 8px;
+    padding: 12px 6px;
+  }
+  .welcome-stat .v {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4a7c2a;
+    display: block;
+  }
+  .welcome-stat .l {
+    font-size: 11px;
+    color: #7a8a99;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .welcome-stars {
+    color: #f5b800;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .welcome-rating {
+    font-size: 13px;
+    color: #5a6c7d;
+    margin-bottom: 20px;
+  }
+  .welcome-rating strong { color: #2c3e50; }
+  .welcome-bullets {
+    background: #f1f7e8;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 18px 0;
+    text-align: left;
+  }
+  .welcome-bullets .wb {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+    color: #2c3e50;
+    padding: 4px 0;
+  }
+  .welcome-bullets .wb .ck {
+    color: #4a7c2a;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .welcome-meta {
+    font-size: 12px;
+    color: #7a8a99;
+    margin-top: 10px;
+  }
+</style>
+<script>!function() {
+    document.addEventListener("DOMContentLoaded", function() {
+        const query = new URLSearchParams(window.location.search);
+        document.querySelectorAll("a")
+            .forEach(function(a) {
+            const url = new URL(a.href);
+            query.forEach(function(value, key) {
+                if (!url.searchParams.has(key)) url.searchParams.set(key, value);
+            });
+            a.href = url.toString();
+        })
+    })
+}()</script></head>
+<body>
+<div class="wrap">
+
+  <div class="card">
+    <div class="logo"><img src="assets/logo.png" alt="Plan Chía"></div>
+    <div class="tagline">Ton plan personnalisé en 2 minutes</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+    <!-- ACCUEIL -->
+    <div class="step active welcome" data-step="start">
+      <div class="hero-ico">🌱</div>
+      <h1>Découvre ton <span class="hl">plan personnalisé</span> avec le chia</h1>
+      <p class="lede">Réponds à 14 questions rapides et reçois ton plan adapté à ton corps et à ton objectif.</p>
+
+      <div class="welcome-stars">★★★★★</div>
+      <div class="welcome-rating"><strong>4,9 / 5</strong> · basé sur +12 000 femmes</div>
+
+      <div class="welcome-stats">
+        <div class="welcome-stat"><span class="v">14</span><span class="l">Questions</span></div>
+        <div class="welcome-stat"><span class="v">2 min</span><span class="l">Durée</span></div>
+        <div class="welcome-stat"><span class="v">100%</span><span class="l">Personnel</span></div>
+      </div>
+
+      <div class="welcome-bullets">
+        <div class="wb"><span class="ck">✓</span> On calcule ton IMC et ton objectif santé</div>
+        <div class="wb"><span class="ck">✓</span> On analyse ton métabolisme et tes habitudes</div>
+        <div class="wb"><span class="ck">✓</span> Tu reçois un plan entièrement adapté à toi</div>
+      </div>
+
+      <button class="btn-primary btn-big" onclick="next()">COMMENCER LE QUIZ →</button>
+      <div class="welcome-meta">🔒 100% gratuit et confidentiel · Sans engagement</div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="step" data-step="q1">
+      <div class="question-num">Question 1 sur 14</div>
+      <h2>Quel est ton âge ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">🌸</span> 18 – 29 ans</button>
+        <button class="option" onclick="next()"><span class="emoji">🌿</span> 30 – 39 ans</button>
+        <button class="option" onclick="next()"><span class="emoji">🍃</span> 40 – 49 ans</button>
+        <button class="option" onclick="next()"><span class="emoji">🌷</span> 50 – 59 ans</button>
+        <button class="option" onclick="next()"><span class="emoji">🌹</span> 60 ans et plus</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q2">
+      <div class="question-num">Question 2 sur 14</div>
+      <h2>Quel est ton sexe ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">👩</span> Femme</button>
+        <button class="option" onclick="next()"><span class="emoji">👨</span> Homme</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q3">
+      <div class="question-num">Question 3 sur 14</div>
+      <h2>Quelle est ta taille ?</h2>
+      <div class="input-group">
+        <input type="number" id="altura" placeholder="165" min="120" max="220">
+        <div class="input-suffix">cm</div>
+      </div>
+      <button class="btn-primary" onclick="saveAndNext('altura')">Continuer</button>
+    </div>
+
+    <div class="step" data-step="q4">
+      <div class="question-num">Question 4 sur 14</div>
+      <h2>Quel est ton poids actuel ?</h2>
+      <div class="input-group">
+        <input type="number" id="peso" placeholder="75" min="30" max="200">
+        <div class="input-suffix">kg</div>
+      </div>
+      <button class="btn-primary" onclick="saveAndNext('peso')">Continuer</button>
+    </div>
+
+    <div class="step" data-step="q5">
+      <div class="question-num">Question 5 sur 14</div>
+      <h2>Quel est ton poids idéal ?</h2>
+      <div class="input-group">
+        <input type="number" id="pesoIdeal" placeholder="60" min="30" max="200">
+        <div class="input-suffix">kg</div>
+      </div>
+      <button class="btn-primary" onclick="saveAndNext('pesoIdeal')">Continuer</button>
+    </div>
+
+    <!-- CHARGEMENT 1 -->
+    <div class="step loading-screen" data-step="l1">
+      <div class="loading-icon">⚖️</div>
+      <h2>Calcul de ton IMC</h2>
+      <div class="loading-bar"><div class="loading-fill" id="lf1"></div></div>
+      <div class="loading-pct" id="lp1">0%</div>
+      <div class="loading-tasks" id="lt1">
+        <div class="loading-task" data-t="0"><span class="check">○</span> Traitement du poids et de la taille</div>
+        <div class="loading-task" data-t="1"><span class="check">○</span> Calcul de l'indice de masse corporelle</div>
+        <div class="loading-task" data-t="2"><span class="check">○</span> Comparaison avec ton objectif</div>
+      </div>
+    </div>
+
+    <div class="step" data-step="q6">
+      <div class="question-num">Question 6 sur 14</div>
+      <h2>Quel type de morphologie te correspond le mieux ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">🍎</span> Pomme — graisse au niveau de l'abdomen</button>
+        <button class="option" onclick="next()"><span class="emoji">🍐</span> Poire — hanches et cuisses</button>
+        <button class="option" onclick="next()"><span class="emoji">⏳</span> Sablier — silhouette équilibrée</button>
+        <button class="option" onclick="next()"><span class="emoji">📏</span> Rectangle — peu de courbes marquées</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q7">
+      <div class="question-num">Question 7 sur 14</div>
+      <h2>Où accumules-tu le plus de graisse ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">🎯</span> Abdomen et taille</button>
+        <button class="option" onclick="next()"><span class="emoji">🍑</span> Hanches et fessiers</button>
+        <button class="option" onclick="next()"><span class="emoji">🦵</span> Cuisses et jambes</button>
+        <button class="option" onclick="next()"><span class="emoji">💪</span> Bras et dos</button>
+        <button class="option" onclick="next()"><span class="emoji">🌐</span> Partout sur le corps</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q8">
+      <div class="question-num">Question 8 sur 14</div>
+      <h2>As-tu déjà essayé de perdre du poids ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">😔</span> Oui, plusieurs fois sans succès</button>
+        <button class="option" onclick="next()"><span class="emoji">🤔</span> Quelques fois, avec des résultats temporaires</button>
+        <button class="option" onclick="next()"><span class="emoji">😊</span> Rarement</button>
+        <button class="option" onclick="next()"><span class="emoji">✋</span> Jamais essayé</button>
+      </div>
+    </div>
+
+    <!-- CHARGEMENT 2 -->
+    <div class="step loading-screen" data-step="l2">
+      <div class="loading-icon">🧬</div>
+      <h2>Analyse de ton métabolisme</h2>
+      <div class="loading-bar"><div class="loading-fill" id="lf2"></div></div>
+      <div class="loading-pct" id="lp2">0%</div>
+      <div class="loading-tasks" id="lt2">
+        <div class="loading-task" data-t="0"><span class="check">○</span> Identification de la morphologie</div>
+        <div class="loading-task" data-t="1"><span class="check">○</span> Évaluation des zones d'accumulation</div>
+        <div class="loading-task" data-t="2"><span class="check">○</span> Croisement avec l'historique alimentaire</div>
+      </div>
+    </div>
+
+    <div class="step" data-step="q9">
+      <div class="question-num">Question 9 sur 14</div>
+      <h2>Combien de repas fais-tu par jour ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">1️⃣</span> 1 ou 2 repas</button>
+        <button class="option" onclick="next()"><span class="emoji">3️⃣</span> 3 repas principaux</button>
+        <button class="option" onclick="next()"><span class="emoji">5️⃣</span> 4 à 5 petits repas</button>
+        <button class="option" onclick="next()"><span class="emoji">🍽️</span> Je mange quand j'ai faim</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q10">
+      <div class="question-num">Question 10 sur 14</div>
+      <h2>Combien de verres d'eau bois-tu par jour ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">💧</span> Moins de 4 verres</button>
+        <button class="option" onclick="next()"><span class="emoji">💧💧</span> Entre 4 et 6 verres</button>
+        <button class="option" onclick="next()"><span class="emoji">💧💧💧</span> Entre 7 et 8 verres</button>
+        <button class="option" onclick="next()"><span class="emoji">🌊</span> Plus de 8 verres</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q11">
+      <div class="question-num">Question 11 sur 14</div>
+      <h2>Combien d'heures dors-tu par nuit ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">😴</span> Moins de 5 heures</button>
+        <button class="option" onclick="next()"><span class="emoji">🛌</span> Entre 5 et 6 heures</button>
+        <button class="option" onclick="next()"><span class="emoji">💤</span> Entre 7 et 8 heures</button>
+        <button class="option" onclick="next()"><span class="emoji">🌙</span> Plus de 8 heures</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q12">
+      <div class="question-num">Question 12 sur 14</div>
+      <h2>À quelle fréquence fais-tu de l'exercice ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">🚫</span> Jamais ou presque jamais</button>
+        <button class="option" onclick="next()"><span class="emoji">🚶</span> De temps en temps</button>
+        <button class="option" onclick="next()"><span class="emoji">🏃</span> 2 à 3 fois par semaine</button>
+        <button class="option" onclick="next()"><span class="emoji">🏋️</span> Presque tous les jours</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q13">
+      <div class="question-num">Question 13 sur 14</div>
+      <h2>Quel est ton niveau de stress ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">😌</span> Faible — je me sens sereine</button>
+        <button class="option" onclick="next()"><span class="emoji">🙂</span> Moyen — gérable</button>
+        <button class="option" onclick="next()"><span class="emoji">😟</span> Élevé — ça m'affecte souvent</button>
+        <button class="option" onclick="next()"><span class="emoji">😫</span> Très élevé — je me sens épuisée</button>
+      </div>
+    </div>
+
+    <div class="step" data-step="q14">
+      <div class="question-num">Question 14 sur 14</div>
+      <h2>Dans combien de temps veux-tu voir des résultats ?</h2>
+      <div class="options">
+        <button class="option" onclick="next()"><span class="emoji">⚡</span> Dans les 4 prochaines semaines</button>
+        <button class="option" onclick="next()"><span class="emoji">🎯</span> En 2 ou 3 mois</button>
+        <button class="option" onclick="next()"><span class="emoji">📅</span> En 4 à 6 mois</button>
+        <button class="option" onclick="next()"><span class="emoji">⏰</span> Je ne suis pas pressée</button>
+      </div>
+    </div>
+
+    <!-- CHARGEMENT FINAL -->
+    <div class="step loading-screen" data-step="l3">
+      <div class="loading-icon">✨</div>
+      <h2>Préparation de ton plan personnalisé</h2>
+      <div class="loading-bar"><div class="loading-fill" id="lf3"></div></div>
+      <div class="loading-pct" id="lp3">0%</div>
+      <div class="loading-tasks" id="lt3">
+        <div class="loading-task" data-t="0"><span class="check">○</span> Conception de ton plan nutritionnel</div>
+        <div class="loading-task" data-t="1"><span class="check">○</span> Sélection des recettes au chia</div>
+        <div class="loading-task" data-t="2"><span class="check">○</span> Optimisation selon ton objectif</div>
+        <div class="loading-task" data-t="3"><span class="check">○</span> Finalisation des recommandations</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =========== PAGE DE VENTE =========== -->
+  <div class="step" data-step="sales" id="sales-section">
+
+    <!-- En-tête -->
+    <div class="result-header">
+      <div class="label">Ton plan est prêt</div>
+      <h1>Tu peux perdre jusqu'à <span id="kgPerder">8</span> kg en 12 semaines</h1>
+      <div class="result-stats">
+        <div class="result-stat">
+          <span class="val" id="statImc">--</span>
+          <span class="lbl">Ton IMC</span>
+        </div>
+        <div class="result-stat">
+          <span class="val" id="statPeso">--</span>
+          <span class="lbl">Poids actuel</span>
+        </div>
+        <div class="result-stat">
+          <span class="val" id="statIdeal">--</span>
+          <span class="lbl">Objectif</span>
+        </div>
+      </div>
+      <div class="imc-classification" id="imcClass">Surpoids</div>
+    </div>
+
+    <!-- Graphique -->
+    <div class="chart-wrap">
+      <div class="chart-title">Ton évolution estimée</div>
+      <div class="chart-sub">En suivant le Plan Chía pendant 12 semaines</div>
+      <svg class="chart-svg" viewBox="0 0 320 180" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gradArea" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6ba832" stop-opacity="0.4"></stop>
+            <stop offset="100%" stop-color="#6ba832" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="40" x2="320" y2="40" stroke="#eef2f6" stroke-width="1"></line>
+        <line x1="0" y1="90" x2="320" y2="90" stroke="#eef2f6" stroke-width="1"></line>
+        <line x1="0" y1="140" x2="320" y2="140" stroke="#eef2f6" stroke-width="1"></line>
+        <path id="chartArea" d="M10,30 L80,55 L160,90 L240,120 L310,145 L310,180 L10,180 Z" fill="url(#gradArea)"></path>
+        <path id="chartLine" d="M10,30 L80,55 L160,90 L240,120 L310,145" stroke="#4a7c2a" stroke-width="3" fill="none" stroke-linecap="round"></path>
+        <circle cx="10" cy="30" r="5" fill="#4a7c2a"></circle>
+        <circle cx="80" cy="55" r="5" fill="#4a7c2a"></circle>
+        <circle cx="160" cy="90" r="5" fill="#4a7c2a"></circle>
+        <circle cx="240" cy="120" r="5" fill="#4a7c2a"></circle>
+        <circle cx="310" cy="145" r="6" fill="#fff" stroke="#4a7c2a" stroke-width="3"></circle>
+      </svg>
+      <div class="chart-legend">
+        <span>Aujourd'hui</span>
+        <span>Sem 3</span>
+        <span>Sem 6</span>
+        <span>Sem 9</span>
+        <span>Sem 12</span>
+      </div>
+    </div>
+
+    <!-- Bénéfices -->
+    <div class="card">
+      <div class="sec-head">
+        <h3>Ce que tu vas accomplir</h3>
+        <p>Résultats soutenus par le chia et une nutrition consciente</p>
+      </div>
+      <div class="benefit-grid">
+        <div class="benefit"><div class="ico">🔥</div><div class="lbl">Brûle la graisse abdominale</div></div>
+        <div class="benefit"><div class="ico">💧</div><div class="lbl">Réduit la rétention d'eau</div></div>
+        <div class="benefit"><div class="ico">⚡</div><div class="lbl">Plus d'énergie au quotidien</div></div>
+        <div class="benefit"><div class="ico">🍽️</div><div class="lbl">Contrôle l'appétit</div></div>
+        <div class="benefit"><div class="ico">💪</div><div class="lbl">Améliore la digestion</div></div>
+        <div class="benefit"><div class="ico">✨</div><div class="lbl">Peau plus radieuse</div></div>
+      </div>
+    </div>
+
+    <!-- Ce que tu reçois -->
+    <div class="card">
+      <div class="sec-head">
+        <h3>Ce qui est inclus dans ton plan</h3>
+        <p>Tout ce dont tu as besoin pour commencer aujourd'hui</p>
+      </div>
+      <div class="includes-list">
+        <div class="includes-item">
+          <div class="ck">✓</div>
+          <div class="body">
+            <strong>Recueil Chía 90 jours</strong>
+            <span>Plus de 70 recettes pas à pas</span>
+          </div>
+          <div class="price-tag">27€</div>
+        </div>
+        <div class="includes-item">
+          <div class="ck">✓</div>
+          <div class="body">
+            <strong>Plan nutritionnel personnalisé</strong>
+            <span>Adapté à ton poids, ton âge et ton objectif</span>
+          </div>
+          <div class="price-tag">19€</div>
+        </div>
+        <div class="includes-item">
+          <div class="ck">✓</div>
+          <div class="body">
+            <strong>Guide de combinaison alimentaire</strong>
+            <span>Comment optimiser la combustion des graisses</span>
+          </div>
+          <div class="price-tag">15€</div>
+        </div>
+        <div class="includes-item">
+          <div class="ck">✓</div>
+          <div class="body">
+            <strong>Liste de courses hebdomadaire</strong>
+            <span>Gagne du temps et de l'argent</span>
+          </div>
+          <div class="price-tag">9€</div>
+        </div>
+        <div class="includes-item">
+          <div class="ck">✓</div>
+          <div class="body">
+            <strong>Accès au groupe de soutien</strong>
+            <span>Communauté privée et accompagnement</span>
+          </div>
+          <div class="price-tag">Gratuit</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avant / Après -->
+    <div class="card">
+      <div class="sec-head">
+        <h3>Vraies femmes, vrais résultats</h3>
+        <p>Regarde ce qu'elles ont accompli avec le plan</p>
+      </div>
+      <div class="before-after">
+        <img src="assets/antes.png" alt="Avant et après" loading="lazy">
+        <img src="assets/resultado-1.jpg" alt="Avant et après" loading="lazy">
+        <img src="assets/resultado-2.jpg" alt="Avant et après" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Comparatif -->
+    <div class="card">
+      <div class="sec-head">
+        <h3>Pourquoi le Plan Chía ?</h3>
+        <p>Comparé aux autres méthodes</p>
+      </div>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="us">Plan Chía</th>
+            <th>Régimes</th>
+            <th>Pilules</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="first">100% naturel</td>
+            <td class="us"><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
+            <td><span class="no">✗</span></td>
+          </tr>
+          <tr>
+            <td class="first">Sans faim</td>
+            <td class="us"><span class="yes">✓</span></td>
+            <td><span class="no">✗</span></td>
+            <td><span class="yes">✓</span></td>
+          </tr>
+          <tr>
+            <td class="first">Sans effet yoyo</td>
+            <td class="us"><span class="yes">✓</span></td>
+            <td><span class="no">✗</span></td>
+            <td><span class="no">✗</span></td>
+          </tr>
+          <tr>
+            <td class="first">Sans effets secondaires</td>
+            <td class="us"><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
+            <td><span class="no">✗</span></td>
+          </tr>
+          <tr>
+            <td class="first">Résultats durables</td>
+            <td class="us"><span class="yes">✓</span></td>
+            <td><span class="no">✗</span></td>
+            <td><span class="no">✗</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Témoignages -->
+    <div class="card">
+      <div class="sec-head">
+        <h3>Ce que disent nos clientes</h3>
+        <p>+12 000 femmes ont déjà transformé leur vie</p>
+      </div>
+      <div class="testimonial">
+        <div class="head">
+          <div class="avatar">MR</div>
+          <div>
+            <div class="name">Marie Rousseau</div>
+            <div class="meta">Paris · Vérifiée</div>
+          </div>
+          <div class="stars">★★★★★</div>
+        </div>
+        <p>« J'ai perdu 7 kilos en 2 mois sans avoir faim. Les recettes sont délicieuses et faciles. La meilleure décision que j'aie prise ! »</p>
+      </div>
+      <div class="testimonial">
+        <div class="head">
+          <div class="avatar">CL</div>
+          <div>
+            <div class="name">Camille Laurent</div>
+            <div class="meta">Lyon · Vérifiée</div>
+          </div>
+          <div class="stars">★★★★★</div>
+        </div>
+        <p>« Je pensais que ce serait comme les autres régimes, mais c'est différent. J'ai plus d'énergie et mon ventre ne gonfle plus. »</p>
+      </div>
+      <div class="testimonial">
+        <div class="head">
+          <div class="avatar">AS</div>
+          <div>
+            <div class="name">Aurélie Simon</div>
+            <div class="meta">Bordeaux · Vérifiée</div>
+          </div>
+          <div class="stars">★★★★★</div>
+        </div>
+        <p>« En 3 semaines j'ai déjà perdu une taille. Je le recommande à 100%, ça vaut chaque centime et bien plus encore. »</p>
+      </div>
+    </div>
+
+    <!-- Garantie -->
+    <div class="guarantee">
+      <div class="guarantee-badge">🛡️</div>
+      <h3>Garantie totale 30 jours</h3>
+      <p>Si tu ne vois pas de résultats ou si tu n'es pas 100% satisfaite, nous te remboursons intégralement. Sans questions, sans complications.</p>
+    </div>
+
+    <!-- Urgence + Prix -->
+    <div class="urgency">
+      ⚠️ <strong>Offre limitée</strong> — Aujourd'hui seulement avec 67% de réduction
+    </div>
+
+    <div class="pricing">
+      <div class="label-promo">Offre spéciale</div>
+      <h3>Plan Chía Complet</h3>
+      <div class="price-old">De 97€</div>
+      <div class="price-new">29<span class="cents">,90€</span></div>
+      <div class="price-installment">ou 3 paiements de 9,97€ sans intérêts</div>
+      <div class="price-save">💰 Tu économises 67,10€</div>
+      <a href="https://mejorhoy.site/hasnaskjasd/checkout.html" style="text-decoration:none;display:block;">
+        <button class="btn-primary btn-big">JE VEUX MON PLAN MAINTENANT →</button>
+      </a>
+      <div class="stamps">
+        <div class="stamp"><div class="ico">🔒</div><div class="lbl">Paiement sécurisé</div></div>
+        <div class="stamp"><div class="ico">⚡</div><div class="lbl">Accès immédiat</div></div>
+        <div class="stamp"><div class="ico">💳</div><div class="lbl">Toutes les cartes</div></div>
+        <div class="stamp"><div class="ico">🛡️</div><div class="lbl">Garantie 30 jours</div></div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card" style="margin-top:16px;">
+      <div class="sec-head">
+        <h3>Questions fréquentes</h3>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Combien de temps avant de voir des résultats ? <span class="arrow">▼</span></div>
+        <div class="faq-a">La plupart de nos clientes remarquent des changements dès les 2 premières semaines : moins de ballonnements, plus d'énergie et une réduction des mensurations. À 4 semaines, les résultats deviennent visibles dans le miroir.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Est-ce sans danger pour ma santé ? <span class="arrow">▼</span></div>
+        <div class="faq-a">Oui, complètement. Le plan est basé sur une alimentation naturelle au chia, une graine approuvée par l'OMS. Nous n'utilisons aucun produit chimique, aucune pilule ni rien d'artificiel.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Vais-je avoir faim ? <span class="arrow">▼</span></div>
+        <div class="faq-a">Non. Le chia contient des fibres qui gonflent dans l'estomac, créant une satiété naturelle. Tu mangeras bien et tu te sentiras rassasiée toute la journée.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Comment est-ce que je reçois le plan ? <span class="arrow">▼</span></div>
+        <div class="faq-a">Dès que ton paiement est confirmé, tu recevras un e-mail avec ton accès à l'espace membres. Fonctionne sur téléphone, tablette et ordinateur.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Et si ça ne fonctionne pas pour moi ? <span class="arrow">▼</span></div>
+        <div class="faq-a">Tu as 30 jours pour l'essayer. Si tu n'es pas 100% satisfaite, nous te remboursons intégralement. Sans questions ni complications.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Le paiement est-il sécurisé ? <span class="arrow">▼</span></div>
+        <div class="faq-a">Totalement. Nous traitons les paiements via des plateformes certifiées avec cryptage bancaire. Tes données sont protégées.</div>
+      </div>
+    </div>
+
+    <!-- CTA Final -->
+    <div class="pricing" style="margin-top:16px;">
+      <h3>Commence ta transformation aujourd'hui</h3>
+      <div class="price-new">29<span class="cents">,90€</span></div>
+      <div class="price-installment">Paiement unique · Accès à vie</div>
+      <a href="https://mejorhoy.site/hasnaskjasd/checkout.html" style="text-decoration:none;display:block;">
+        <button class="btn-primary btn-big">COMMENCER MAINTENANT →</button>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const data = {};
+  const order = [
+    'start',
+    'q1','q2','q3','q4','q5',
+    'l1',
+    'q6','q7','q8',
+    'l2',
+    'q9','q10','q11','q12','q13','q14',
+    'l3',
+    'sales'
+  ];
+  let idx = 0;
+
+  function showStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const el = document.querySelector(`[data-step="${step}"]`);
+    if (el) el.classList.add('active');
+    const quizPos = order.indexOf(step);
+    const pct = Math.min(((quizPos + 1) / order.length) * 100, 100);
+    document.getElementById('progress').style.width = pct + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (step.startsWith('l')) runLoading(step);
+    if (step === 'sales') renderSales();
+  }
+
+  function next() {
+    idx++;
+    showStep(order[idx]);
+  }
+
+  function saveAndNext(field) {
+    const v = document.getElementById(field).value;
+    if (!v) return;
+    data[field] = parseFloat(v);
+    next();
+  }
+
+  function runLoading(step) {
+    const num = step.replace('l','');
+    const fill = document.getElementById('lf' + num);
+    const pct = document.getElementById('lp' + num);
+    const tasks = document.querySelectorAll(`#lt${num} .loading-task`);
+    let p = 0;
+    fill.style.width = '0%';
+    pct.textContent = '0%';
+    tasks.forEach(t => { t.classList.remove('done'); t.querySelector('.check').textContent = '○'; });
+
+    const interval = setInterval(() => {
+      p += 2;
+      fill.style.width = p + '%';
+      pct.textContent = p + '%';
+      const tIdx = Math.floor((p / 100) * tasks.length);
+      tasks.forEach((t, i) => {
+        if (i < tIdx) {
+          t.classList.add('done');
+          t.querySelector('.check').textContent = '✓';
+        }
+      });
+      if (p >= 100) {
+        clearInterval(interval);
+        tasks.forEach(t => {
+          t.classList.add('done');
+          t.querySelector('.check').textContent = '✓';
+        });
+        setTimeout(next, 500);
+      }
+    }, 50);
+  }
+
+  function renderSales() {
+    const peso = data.peso || 75;
+    const altura = data.altura || 165;
+    const ideal = data.pesoIdeal || (peso - 8);
+    const imc = (peso / Math.pow(altura/100, 2)).toFixed(1);
+    const diff = Math.max(1, Math.round(peso - ideal));
+
+    document.getElementById('statImc').textContent = imc;
+    document.getElementById('statPeso').textContent = peso + ' kg';
+    document.getElementById('statIdeal').textContent = ideal + ' kg';
+    document.getElementById('kgPerder').textContent = diff;
+
+    let cls = 'Poids normal';
+    if (imc < 18.5) cls = 'Insuffisance pondérale';
+    else if (imc >= 25 && imc < 30) cls = 'Surpoids';
+    else if (imc >= 30) cls = 'Obésité';
+    document.getElementById('imcClass').textContent = cls;
+  }
+
+  function toggleFaq(el) {
+    el.parentElement.classList.toggle('open');
+  }
+</script>
+
+</body></html>
